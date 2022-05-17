@@ -1,0 +1,84 @@
+package com.pingpong.admin.user;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.annotation.Rollback;
+
+import com.pingpong.common.entity.Role;
+import com.pingpong.common.entity.User;
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+@Rollback(false)
+public class UserRepositoryTest {
+
+	@Autowired
+	private UserRepository repo;
+	@Autowired
+	private TestEntityManager entityManager;
+
+	@Test
+	public void createUser() {
+		Role role = entityManager.find(Role.class, 1);
+		User user = new User("dangthaitay96@gmail.com", "123456", "Đặng Thái", "Tây");
+		user.addRole(role);
+
+		User saveUser = repo.save(user);
+		assertThat(saveUser.getId()).isGreaterThan(0);
+	}
+	@Test
+	public void createUser2() {
+		
+		User user2 = new User("tay1@gmail.com", "123456", "Đặng Thái", "A");
+		
+		Role roleSalesperson = new Role(2);
+		Role roleEditor = new Role(3);
+		Role roleAssistant = new Role(5);
+		
+		user2.addRole(roleSalesperson);
+		user2.addRole(roleEditor);
+		user2.addRole(roleAssistant);
+		
+		User saveUser2 = repo.save(user2);
+		assertThat(saveUser2.getId()).isGreaterThan(0);
+	}
+	@Test
+	public void listUser() {
+		Iterable<User> listUser = repo.findAll();
+		listUser.forEach(u -> System.out.println(u));
+	}
+	
+	@Test
+	public void getUserById() {
+		User user = repo.findById(1).get();
+		System.out.println(user);
+		assertThat(user).isNotNull();
+	}
+	@Test
+	public void getUserById2() {
+		Optional<User> user = repo.findById(2);
+		System.out.println(user);
+	}
+	@Test
+	public void testUpdate() {
+		User user = repo.findById(1).get();
+		user.setEnabled(true);
+		
+		repo.save(user);
+	}
+	@Test
+	public void testUpdateRole() {
+		User user = repo.findById(2).get();
+		
+		
+		repo.save(user);
+	}
+}

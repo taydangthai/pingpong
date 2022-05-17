@@ -1,0 +1,32 @@
+package com.pingpong.admin.user;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.annotation.Rollback;
+
+import com.pingpong.common.entity.Role;
+import com.pingpong.common.entity.User;
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+@Rollback(false)
+public class UserRepositoryTest {
+	
+	@Autowired
+	private UserRepository repo;
+	@Autowired
+	private TestEntityManager entityManager;
+	
+	@Test
+	public void createUser() {
+		Role role = entityManager.find(Role.class, 1);
+		User user = new User("dangthaitay96@gmail.com", "123456", "Đặng Thái", "Tây");
+		user.addRole(role);
+		
+		User saveUser = repo.save(user);
+	}
+}

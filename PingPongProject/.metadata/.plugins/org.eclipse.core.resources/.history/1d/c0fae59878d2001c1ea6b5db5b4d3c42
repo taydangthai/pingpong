@@ -1,0 +1,5 @@
+package com.pingpong.admin.security;
+
+public class WebSecurityConfig extends {
+
+}

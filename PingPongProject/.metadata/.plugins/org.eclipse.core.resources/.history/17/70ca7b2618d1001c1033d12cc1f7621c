@@ -1,0 +1,3 @@
+server.port=8383
+server.servlet.context-path=/PingPongAdmin
+<mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>

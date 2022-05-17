@@ -1,0 +1,57 @@
+package com.pingpong.admin.user;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.pingpong.common.entity.Role;
+import com.pingpong.common.entity.User;
+
+@Service
+public class UserService {
+	
+	private static Logger logger = Logger.getLogger(LoginController.class);
+	
+	@Autowired
+	private UserRepository userRepo;
+	
+	@Autowired
+	public PasswordEncoder encoder;
+	
+	@Autowired
+	private RoleReposiroty roleRepo;
+	
+	public List<User> listUsers(){
+		return (List<User>) userRepo.findAll();
+	}
+	
+	public List<Role> listRoles(){
+		return (List<Role>) roleRepo.findAll();
+	}
+	
+	public void newUser(User user) {
+		encoderPassword(user);
+		userRepo.save(user);
+	}
+	private void encoderPassword(User user) {
+		String encoderPassword = encoder.encode(user.getPassword());
+		user.setPassword(encoderPassword);
+	}
+	public boolean isEmailUnique(String email) {
+		User user =  userRepo.getUserByEmail(email);
+		return user == null;
+	}
+
+	public User getId(Integer id) {
+		// TODO Auto-generated method stub
+		try {
+			return userRepo.findById(id).get();
+		} catch (Exception e) {
+			// TODO: handle exception
+			("could not find any	user with id" + id);
+		}
+		
+	}
+}

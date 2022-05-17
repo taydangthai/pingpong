@@ -1,0 +1,5 @@
+*.icon-while {color:while}
+*.icon-silver {color:silver}
+*.icon-green {color:green}
+*.icon-black {color:black}
+*.icon-red {color:red;}

@@ -1,0 +1,5 @@
+server.port=8383
+server.servlet.context-path=/PingPongAdmin
+
+spring.mvc.view.prefix=/web-inf/jsp/
+spring.mvc.view.suffix=.html

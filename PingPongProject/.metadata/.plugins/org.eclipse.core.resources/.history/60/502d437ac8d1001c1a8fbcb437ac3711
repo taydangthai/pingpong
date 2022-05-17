@@ -1,0 +1,5 @@
+package com.pingpong.admin.user;
+
+public interface RoleReposiroty {
+
+}
