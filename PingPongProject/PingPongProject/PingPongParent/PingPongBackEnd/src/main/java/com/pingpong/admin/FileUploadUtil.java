@@ -10,18 +10,35 @@ import java.nio.file.StandardCopyOption;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileUploadUtil {
+
 	public static void saveFile(String uploadDir, String fileName, MultipartFile multipartFile) throws IOException {
-		
-		Path uploadPath = Paths.get(uploadDir); 
-		if(!Files.exists(uploadPath)) {
+
+		Path uploadPath = Paths.get(uploadDir);
+		if (!Files.exists(uploadPath)) {
 			Files.createDirectories(uploadPath);
-		} 
+		}
 		try (InputStream inputStream = multipartFile.getInputStream()) {
 			Path filePath = uploadPath.resolve(fileName);
 			Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-			
+
 		} catch (IOException e) {
 			throw new IOException("Coult not save file: " + fileName, e);
-		} 
+		}
+	}
+
+	public static void clearDir(String dir) {
+		Path dirPath = Paths.get(dir);
+
+		try {
+			Files.list(dirPath).forEach(file -> {
+				try {
+					Files.delete(dirPath);
+				} catch (Exception e) {
+					System.err.print("could not delete file: " + file);
+				}
+			});
+		} catch (Exception e) {
+			System.err.print("could not list directory: " + dirPath);
+		}
 	}
 }

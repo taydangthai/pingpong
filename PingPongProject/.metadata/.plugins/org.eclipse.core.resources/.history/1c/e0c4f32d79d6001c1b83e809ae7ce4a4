@@ -1,0 +1,46 @@
+package com.pingpong.admin;
+
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+public class ApplicationConfiguration extends WebMvcConfigurerAdapter implements ApplicationContextAware {
+
+	@Bean(name="HelloWorld")
+	   public SpringResourceTemplateResolver templateResolver() {
+	        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+	        templateResolver.setApplicationContext(applicationContext);
+	        templateResolver.setPrefix("/WEB-INF/views/");
+	        templateResolver.setSuffix(".html");
+	        templateResolver.setTemplateMode(TemplateMode.HTML);
+	        return templateResolver;
+	   }
+
+	    @Bean
+	    public TemplateEngine templateEngine(){
+	        TemplateEngine templateEngine = new SpringTemplateEngine();
+	        templateEngine.setTemplateResolver(templateResolver());
+	        templateEngine.addDialect(new SpringSecurityDialect());
+	        return templateEngine;
+	    }
+
+	    @Bean
+	    public ViewResolver viewResolver(){
+	        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+	        viewResolver.setTemplateEngine(templateEngine());
+	        return viewResolver;
+	    }
+	    private ApplicationContext applicationContext;
+
+	    @Override
+	    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	        this.applicationContext = applicationContext;
+	    }
+	   /*
+	     * Configure ResourceHandlers to serve static resources like CSS/ Javascript etc...
+	     *
+	     */
+	    @Override
+	    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	        registry.addResourceHandler("/static/**").addResourceLocations("/static/");
+	    }
+}

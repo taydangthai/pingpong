@@ -1,0 +1,8 @@
+package com.pingpong.admin;
+
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+public class ApplicationConfiguration extends WebMvcConfigurerAdapter implements ApplicationContextAware {
+
+}
