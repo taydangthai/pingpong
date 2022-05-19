@@ -34,8 +34,10 @@ public class UserService {
 		return (List<User>) userRepo.findAll();
 	}
 	
-	public Page<User> listByPage(int pageNume) {
-		PageRequest pageable =  PageRequest.of(pageNume - 1 , USERS_PER_PAGE);
+	public Page<User> listByPage(int pageNume, String sortField, String sortDir) {
+		Sort sort = Sort.by(sortField);
+		sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+		PageRequest pageable =  PageRequest.of(pageNume - 1 , USERS_PER_PAGE, sort);
 		return userRepo.findAll(pageable);
 	}
 	

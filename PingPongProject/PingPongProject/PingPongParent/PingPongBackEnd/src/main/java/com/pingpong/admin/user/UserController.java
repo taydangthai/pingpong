@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -29,13 +30,14 @@ public class UserController {
 
 	@GetMapping("/users")
 	public String listUser(Model model) {
-		return listByPage(1, model);
+		return listByPage(1, model, "firstName", "asc");
 	}
 	
-	@GetMapping("/{pageNum}")
-	public String listByPage(@PathVariable(name = "pageNum") int pageNum, Model model) {
-		try {
-			Page<User> page = userService.listByPage(pageNum);
+	@GetMapping("/users/{pageNum}")
+	public String listByPage(@PathVariable(name = "pageNum") int pageNum, Model model,
+			@Param("sortField") String sortField, @Param("sortDir") String sortDir) {
+	
+			Page<User> page = userService.listByPage(pageNum, sortField, sortDir);
 			List<User> listUsers = page.getContent();
 			
 			long startCount = (pageNum - 1)* UserService.USERS_PER_PAGE + 1;
@@ -43,6 +45,7 @@ public class UserController {
 			if(endCount > page.getTotalElements()) {
 				endCount = page.getTotalElements();
 			}
+			String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
 			
 			model.addAttribute("currentPage", pageNum);
 			model.addAttribute("totalPages", page.getTotalPages());
@@ -50,12 +53,11 @@ public class UserController {
 			model.addAttribute("endCount", endCount);
 			model.addAttribute("totalItems", page.getTotalElements());
 			model.addAttribute("listUsers", listUsers);
+			model.addAttribute("sortField", sortField);
+			model.addAttribute("sortDir", sortDir);
+			model.addAttribute("reverseSortDir", reverseSortDir);
 			
-			return "/users";
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return "users";
+			return "users";
 	}
 
 	@GetMapping("/new-user")
@@ -75,6 +77,7 @@ public class UserController {
 			RedirectAttributes attributes) throws IOException {
 		System.out.println(user);
 		System.out.println(multipartFile.getOriginalFilename());
+		
 		if(!multipartFile.isEmpty()) {
 			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
 			
@@ -82,7 +85,7 @@ public class UserController {
 			User saveUser = userService.newUser(user);
 			
 			String uploadDir = "user-photos/" + saveUser.getId();
-			
+
 			FileUploadUtil.clearDir(uploadDir);
 			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
 		} else {
@@ -127,8 +130,9 @@ public class UserController {
 		return "redirect:users";
 	}
 	
-	@GetMapping("/user/{id}/enabled/{status}")
-	public String updateStatus(@PathVariable("id") Integer id, @PathVariable("status") Boolean enabled, 
+	@GetMapping("/users/{id}/enabled/{status}")
+	public String updateStatus(@PathVariable("id") Integer id, 
+			@PathVariable("status") Boolean enabled, 
 			RedirectAttributes attributes) {
 		
 		userService.updateStatus(id, enabled);
